@@ -105,7 +105,8 @@
 
 
 
-        FDevice(QString serialport = "", int baud_rate = 57600);
+//        FDevice(QString serialport = "", int baud_rate = 57600);
+        FDevice(QSerialPort *serial);
 
 
 
@@ -131,7 +132,7 @@
     public slots:
 
         void initialize();
-        void processSerial();
+        void processSerial(const QByteArray &data);
         void parseBuffer();
 
 
@@ -143,3 +144,4 @@
 //}
 
 #endif // FIRMATATOR_H
+
