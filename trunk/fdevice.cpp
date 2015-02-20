@@ -1,4 +1,3 @@
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,33 +12,35 @@
 //using namespace firmatator;
 
 
-FDevice::FDevice(QString serialport, int baudrate)
+FDevice::FDevice(QSerialPort *serial)
 {
     parserBuffer = (uint8_t*) malloc(4096);
     connected = false;
+    this->serial = serial;
 
-    if (serialport == "")
-    {
-        QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
-        serialport = list.value(0).portName();
-    }
+//    if (serial == "")
+//    {
+//        QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
+//        serial = list.value(0).portName();
+//    }
 
-    this->serial = new QSerialPort(this);
-    this->serial->setBaudRate(QSerialPort::Baud57600);
-    this->serial->setPortName(serialport);
-    this->serial->setDataBits(QSerialPort::Data8);
-    this->serial->setParity(QSerialPort::NoParity);
-    this->serial->setStopBits(QSerialPort::OneStop);
-    this->serial->setFlowControl(QSerialPort::NoFlowControl);
+//    serial = new QSerialPort(this);
+//    serial->setBaudRate(QSerialPort::Baud57600);
+//    serial->setPortName(serial);
+//    serial->setDataBits(QSerialPort::Data8);
+//    serial->setParity(QSerialPort::NoParity);
+//    serial->setStopBits(QSerialPort::OneStop);
+//    serial->setFlowControl(QSerialPort::NoFlowControl);
 
 
-    QObject::connect(this->serial, SIGNAL(readyRead()), this, SLOT(processSerial()));
+//    QObject::connect(this->serial, SIGNAL(readyRead()), this, SLOT(processSerial()));
     QObject::connect(this, SIGNAL(deviceReady()), this, SLOT(initialize()));
 }
 
 bool FDevice::connect()
 {
-    connected = this->serial->open(QIODevice::ReadWrite);
+    connected = serial->isOpen();
+//    connected = serial->open(QIODevice::ReadWrite);
 
     if (connected)
         reportFirmware();
@@ -49,7 +50,7 @@ bool FDevice::connect()
 
 void FDevice::disconnect()
 {
-    this->serial->close();
+    serial->close();
     connected = false;
     ready = false;
 }
@@ -57,7 +58,7 @@ void FDevice::disconnect()
 void FDevice::initialize()
 {
     requestCapabilities();
-    reportPins();
+//    reportPins();
 }
 
 void FDevice::reportFirmware()
@@ -72,6 +73,7 @@ void FDevice::reportFirmware()
 
     serial->write(s);
     serial->flush();
+    qDebug() << "COMMAND_REPORT_FIRMWARE " << s;
 }
 
 // This informs if a pin can be analog, digital in/out, servo or what (I think);
@@ -222,9 +224,9 @@ QByteArray FDevice::digitalWrite(int pin, int value)
     QByteArray s = QByteArray(buffer, 3);
     qDebug() << s;
 
-//    serial->write(s);
+    serial->write(s);
     qDebug() << serial->bytesToWrite();
-//    serial->flush();
+    serial->flush();
 
 
     qDebug() << "Digital Port Number (Internal array):" <<  digitalOutputData[portNumber] << "port# " <<portNumber ;
@@ -249,9 +251,9 @@ QByteArray FDevice::analogWrite(int pin, int value)
     QByteArray s = QByteArray(buffer, 3);
     //qDebug() << s;
 
-//    serial->write(s);
+    serial->write(s);
     //qDebug() << serial->bytesToWrite();
-//    serial->flush();
+    serial->flush();
     return (s);
 }
 
@@ -336,13 +338,14 @@ void FDevice::I2CConfig(int pinState, int delay)
     }
 }
 
-void FDevice::processSerial()
+void FDevice::processSerial(const QByteArray &data)
 {
-    int len = this->serial->bytesAvailable();
+//    int len = serial->bytesAvailable();
 
     //qDebug() << "Read buffer: " << len;
 
-    QByteArray r = this->serial->readAll();
+    QByteArray r = data;
+//    QByteArray r = serial->readAll();
 
     //qDebug() << "Datos leidos: " << r;
 
@@ -456,7 +459,7 @@ void FDevice::parseBuffer()
     }
     else if (parserBuffer[0] == COMMAND_START_SYSEX && parserBuffer[parserReceivedCount - 1] == COMMAND_END_SYSEX)
     {
-        qDebug("Sexy sysex!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        qDebug("sysex!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         for (int i=0; i<10; i++){
 //            digitalInputData[i]=0x00;
             digitalOutputData[i]=0x00;
@@ -567,4 +570,6 @@ void FDevice::parseBuffer()
 
     //qDebug() << "Command completed!!";
 }
+
+
 
