@@ -309,6 +309,11 @@ void MainWindow::printInputs()
 }
 
 //! [12]
+//this an example to send message in firmata format without arduino object
+//for learning purpose
+//if you understand then you may remove this member function.
+//
+
 void MainWindow::SetPinArduino()
 {
 //    if (arduino->available())
@@ -367,6 +372,8 @@ void MainWindow::SetPinArduino()
 }
 
 //! [13]
+//this is an example to call arduino object's digitalWrite member function
+//
 void MainWindow::DWrite()
 {
 // if (arduino->available())
@@ -417,6 +424,10 @@ void MainWindow::DevOpen()
     arduino->connect();
 
 }
+//this an example to send message in firmata format without arduino object
+//for learning purpose
+//if you understand then you may remove this member function.
+//
 
 void MainWindow::digitalWrite(int pin, int value)
 {
@@ -461,6 +472,11 @@ void MainWindow::digitalWrite(int pin, int value)
     qDebug() << "Digital Port Number (Internal array):" <<  MaindigitalOutputData[portNumber] << "port# " <<portNumber ;
     qDebug() << "Command: " << lowerToHex(arduino->COMMAND_DIGITAL_MESSAGE | portNumber) << " / LSB: " << lowerToHex(MaindigitalOutputData[portNumber] & 0x7F) << " / MSB: " << lowerToHex(MaindigitalOutputData[portNumber] >> 7);
 }
+
+//this an example to send message in firmata format without arduino object
+//for learning purpose
+//if you understand then you may remove this member function.
+//
 
 void MainWindow::SetPin12()
 {
