@@ -15,4 +15,4 @@ arduino duelaminova
 
 arduino uno, mega2560
 
-any problem pls contact rusman (dot) rusyadi 
+any problem pls contact rusman (dot) rusyadi (at) gmail (dot) com
